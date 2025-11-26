@@ -90,24 +90,36 @@ TEMPLATES = [
 WSGI_APPLICATION = 'stablelinkcapital.wsgi.application'
 
 
+# import dj_database_url
+# import os
+
+# DATABASE_URL = os.getenv("DATABASE_URL")
+
+# if DATABASE_URL:
+#     print("🔵 Using PRODUCTION/PostgreSQL database from DATABASE_URL")
+#     DATABASES = {
+#         'default': dj_database_url.config(conn_max_age=600)
+#     }
+# else:
+#     print("🟢 Using LOCAL SQLite database")
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+
+
 import dj_database_url
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL:
-    print("🔵 Using PRODUCTION/PostgreSQL database from DATABASE_URL")
-    DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600)
-    }
-else:
-    print("🟢 Using LOCAL SQLite database")
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 
 
 # Password validation
