@@ -1,6 +1,8 @@
 {
   "build": {
-    "builder": "heroku/buildpacks:20"
+    "commands": [
+      "pip install -r requirements.txt"
+    ]
   },
   "deploy": {
     "startCommand": "gunicorn stablelinkcapital.wsgi:application"
