@@ -184,9 +184,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/userprofile/login/'
 # Force HTTPS in Django
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.zoho.com'
@@ -255,10 +255,10 @@ LOGGING = {
 
 
 
-
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.up.railway.app",
-    "https://yourcustomdomain.com",   # if you have one
+    "https://stablelinkcapitalrailway-production.up.railway.app",
+    "https://www.stablelinkcapital.com",
+    "https://stablelinkcapital.com",
 ]
 
 
