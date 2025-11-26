@@ -276,8 +276,6 @@
 #     "https://stablelinkcapital.com",
 # ]
 
-
-
 """
 Django settings for stablelinkcapital project.
 """
@@ -298,7 +296,7 @@ SECRET_KEY = os.getenv(
     "django-insecure-dev-key"  # fallback for local only
 )
 
-# DEBUG (automatic)
+# DEBUG
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Allowed hosts
@@ -317,7 +315,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.stablelinkcapital.com",
 ]
 
-# Apps
+# Applications
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -338,7 +336,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",   # MUST be here
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -353,7 +351,9 @@ ROOT_URLCONF = "stablelinkcapital.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -367,15 +367,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "stablelinkcapital.wsgi.application"
 
-# DATABASE (Railway PostgreSQL)
+# Database (Railway PostgreSQL)
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"), 
-        conn_max_age=600
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
     )
 }
 
-# Password validation
+# Password Validators
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -389,21 +389,30 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# ---------------------------------------
+# STATIC FILES — FIXED FOR RAILWAY
+# ---------------------------------------
+
 STATIC_URL = "/static/"
 
+# Static root (ALWAYS needed on Railway)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# WhiteNoise handles file compression/caching
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Local static folder
 if DEBUG:
     STATICFILES_DIRS = [BASE_DIR / "static"]
-else:
-    STATIC_ROOT = BASE_DIR / "staticfiles"
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Login redirect
 LOGIN_URL = "/userprofile/login/"
 
-# SECURITY (only on production)
+# ---------------------------------------
+# SECURITY SETTINGS
+# ---------------------------------------
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -413,7 +422,9 @@ else:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 
-# Email (placeholder, safe for deployment)
+# ---------------------------------------
+# EMAIL (placeholder)
+# ---------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.zoho.com"
 EMAIL_PORT = 587
@@ -421,9 +432,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-ADMIN_EMAIL = EMAIL_HOST_USER
 
-# Logging
+# ---------------------------------------
+# LOGGING
+# ---------------------------------------
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -432,6 +444,3 @@ LOGGING = {
     },
     "root": {"handlers": ["console"], "level": "INFO"},
 }
-
-
-
