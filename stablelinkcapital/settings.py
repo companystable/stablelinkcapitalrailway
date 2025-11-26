@@ -30,12 +30,16 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "stablelinkcapital.onrender.com",
-    "stablelinkcapital.com",
-    "www.stablelinkcapital.com",
+    'localhost',
+    '127.0.0.1',
+    'stablelinkcapitalrailway-production.up.railway.app',
+    'stablelinkcapital.com',
+    'www.stablelinkcapital.com',
 ]
+
+if 'RAILWAY_STATIC_URL' in os.environ:
+    ALLOWED_HOSTS.append(os.environ.get('RAILWAY_PUBLIC_DOMAIN', ''))
+
 
 
 # Application definition
