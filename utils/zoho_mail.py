@@ -2,7 +2,11 @@ import os
 import requests
 from django.conf import settings
 
-
+# Fetch Zoho credentials from Django settings or environment
+ZOHO_CLIENT_ID = getattr(settings, "ZOHO_CLIENT_ID", os.getenv("ZOHO_CLIENT_ID"))
+ZOHO_CLIENT_SECRET = getattr(settings, "ZOHO_CLIENT_SECRET", os.getenv("ZOHO_CLIENT_SECRET"))
+ZOHO_REFRESH_TOKEN = getattr(settings, "ZOHO_REFRESH_TOKEN", os.getenv("ZOHO_REFRESH_TOKEN"))
+ZOHO_FROM_EMAIL = getattr(settings, "ZOHO_FROM_EMAIL", os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com"))
 
 # ----------------------------
 # Get Zoho OAuth access token
