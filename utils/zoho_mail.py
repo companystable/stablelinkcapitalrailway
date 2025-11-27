@@ -11,33 +11,30 @@ def get_zoho_access_token():
     }
 
     r = requests.post(url, data=data, timeout=10)
-
-    print("🔍 Zoho token response status:", r.status_code)
-    print("🔍 Zoho token response text:", r.text)
-
     r.raise_for_status()
-
     js = r.json()
+
     if "access_token" not in js:
         raise Exception(f"Zoho did not return access_token. Response: {js}")
 
     return js["access_token"]
 
-    
-
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     access_token = get_zoho_access_token()
 
-    # ✅ Correct region: US (based on your token: zohoapis.com)
-    url = "https://mail.zoho.com/api/sendmail"
+    # Step 1: Get accountId
+    accounts_url = "https://mail.zoho.com/api/accounts"
+    headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
+    acc_response = requests.get(accounts_url, headers=headers, timeout=10)
+    acc_response.raise_for_status()
+    account_id = acc_response.json()["data"][0]["accountId"]
 
-    headers = {
-        "Authorization": f"Zoho-oauthtoken {access_token}"
-    }
+    # Step 2: Send email using accountId
+    send_url = f"https://mail.zoho.com/api/accounts/{account_id}/messages?action=send"
 
     payload = {
-        "from": settings.ZOHO_FROM_EMAIL,
-        "to": to_email if isinstance(to_email, str) else ",".join(to_email),
+        "fromAddress": settings.ZOHO_FROM_EMAIL,
+        "toAddress": to_email if isinstance(to_email, list) else [to_email],
         "subject": subject,
         "content": plain_text or "",
     }
@@ -45,6 +42,11 @@ def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     if html_content:
         payload["content"] = html_content
 
-    resp = requests.post(url, data=payload, headers=headers, timeout=10)
+    email_headers = {
+        "Authorization": f"Zoho-oauthtoken {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    resp = requests.post(send_url, json=payload, headers=email_headers, timeout=10)
     resp.raise_for_status()
     return resp.json()
