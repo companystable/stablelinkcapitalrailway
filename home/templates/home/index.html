@@ -1587,6 +1587,37 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
+<script>
+(function() {
+    // Detect the user's region and language
+    const userLang = navigator.language || navigator.userLanguage; // e.g., "en-US", "fr-FR"
+    const userRegion = userLang.split('-')[1] || 'US'; // Extract region code
+
+    console.log('User language:', userLang);
+    console.log('User region:', userRegion);
+
+    // Example: map regions to translations (could be extended)
+    const translations = {
+        'FR': 'https://yourdomain.com/fr', // French version
+        'ES': 'https://yourdomain.com/es', // Spanish version
+        'DE': 'https://yourdomain.com/de', // German version
+    };
+
+    // Redirect if a matching translation exists
+    if (translations[userRegion]) {
+        // Optional: only redirect if not already on that page
+        if (window.location.href !== translations[userRegion]) {
+            window.location.href = translations[userRegion];
+        }
+    }
+
+    // OR, if you want to suggest translation via Google Translate
+    // you could show a banner/prompt:
+    // alert(`It looks like you're in ${userRegion}. Do you want to view this site in your language?`);
+})();
+</script>
+
+
 
 
 <!-- Vendor JS Files -->
