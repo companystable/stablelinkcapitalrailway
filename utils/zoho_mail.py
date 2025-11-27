@@ -2,11 +2,17 @@ import os
 import requests
 from django.conf import settings
 
-# Fetch Zoho credentials from Django settings or environment
+# ----------------------------
+# Fetch Zoho credentials
+# ----------------------------
 ZOHO_CLIENT_ID = getattr(settings, "ZOHO_CLIENT_ID", os.getenv("ZOHO_CLIENT_ID"))
 ZOHO_CLIENT_SECRET = getattr(settings, "ZOHO_CLIENT_SECRET", os.getenv("ZOHO_CLIENT_SECRET"))
 ZOHO_REFRESH_TOKEN = getattr(settings, "ZOHO_REFRESH_TOKEN", os.getenv("ZOHO_REFRESH_TOKEN"))
 ZOHO_FROM_EMAIL = getattr(settings, "ZOHO_FROM_EMAIL", os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com"))
+
+# Zoho EU endpoints
+ZOHO_OAUTH_URL = "https://accounts.zoho.eu/oauth/v2/token"
+ZOHO_MAIL_BASE_URL = "https://mail.zoho.eu/api"
 
 # ----------------------------
 # Get Zoho OAuth access token
@@ -15,7 +21,6 @@ def get_zoho_access_token():
     """
     Obtain a new access token using the refresh token.
     """
-    url = "https://accounts.zoho.com/oauth/v2/token"
     data = {
         "grant_type": "refresh_token",
         "client_id": ZOHO_CLIENT_ID,
@@ -23,7 +28,7 @@ def get_zoho_access_token():
         "refresh_token": ZOHO_REFRESH_TOKEN,
     }
 
-    response = requests.post(url, data=data, timeout=10)
+    response = requests.post(ZOHO_OAUTH_URL, data=data, timeout=10)
     response.raise_for_status()
     token_data = response.json()
 
@@ -37,12 +42,12 @@ def get_zoho_access_token():
 # ----------------------------
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     """
-    Sends an email using Zoho Mail API v2.
+    Sends an email using Zoho Mail API v2 (EU region).
     """
     access_token = get_zoho_access_token()
 
     # Step 1: Get accountId
-    accounts_url = "https://mail.zoho.com/api/accounts"
+    accounts_url = f"{ZOHO_MAIL_BASE_URL}/accounts"
     headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
     acc_response = requests.get(accounts_url, headers=headers, timeout=10)
     acc_response.raise_for_status()
@@ -54,7 +59,7 @@ def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     account_id = accounts_data["data"][0]["accountId"]
 
     # Step 2: Prepare send email URL
-    send_url = f"https://mail.zoho.com/api/accounts/{account_id}/messages?action=send"
+    send_url = f"{ZOHO_MAIL_BASE_URL}/accounts/{account_id}/messages?action=send"
 
     # Step 3: Prepare payload
     payload = {
@@ -84,9 +89,9 @@ def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
 if __name__ == "__main__":
     try:
         result = send_zoho_email(
-            to_email="recipient@example.com",
+            to_email="vanessavaldezwhite@gmail.com",
             subject="Test Email from Django Zoho API",
-            html_content="<h1>Hello from Zoho!</h1>"
+            html_content="<h1>Hello from Zoho EU!</h1>"
         )
         print("Email sent successfully:", result)
     except Exception as e:
