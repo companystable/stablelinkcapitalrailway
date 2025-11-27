@@ -10,6 +10,7 @@ urlpatterns = [
     path('userprofile/', include('userprofile.urls')),
     path('investment/', include('investment.urls')),  # Ensure 'investment.urls' is correct
     path('connectwallet/', include('connectwallet.urls')),
+    path('zoho/oauth/callback/', home_views.zoho_oauth_callback, name='zoho_oauth_callback'),
 ]
 
 # Add this at the end to serve media files in development
