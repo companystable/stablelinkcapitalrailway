@@ -17,7 +17,8 @@ def get_zoho_access_token():
 
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     access_token = get_zoho_access_token()
-    url = "https://mail.zoho.com/api/sendmail"
+    url = url = "https://mail.zoho.eu/api/sendmail"
+
     headers = {
         "Authorization": f"Zoho-oauthtoken {access_token}"
     }
