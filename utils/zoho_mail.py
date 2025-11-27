@@ -2,6 +2,10 @@ import requests
 from django.conf import settings
 
 def get_zoho_access_token():
+    """
+    Retrieve a Zoho access token using a refresh token.
+    Returns the access token and api_domain.
+    """
     url = "https://accounts.zoho.com/oauth/v2/token"
     data = {
         "grant_type": "refresh_token",
@@ -14,33 +18,33 @@ def get_zoho_access_token():
     r.raise_for_status()
     js = r.json()
 
-    if "access_token" not in js:
-        raise Exception(f"Zoho did not return access_token. Response: {js}")
+    if "access_token" not in js or "api_domain" not in js:
+        raise Exception(f"Zoho did not return access_token or api_domain. Response: {js}")
 
-    return js["access_token"]
+    return js["access_token"], js["api_domain"]  # Return domain for correct region
 
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
-    access_token = get_zoho_access_token()
+    """
+    Sends an email via Zoho Mail using the proper API domain and accountId.
+    """
+    access_token, api_domain = get_zoho_access_token()
 
     # Step 1: Get accountId
-    accounts_url = "https://mail.zoho.com/api/accounts"
+    accounts_url = f"{api_domain}/mail/v1/accounts"
     headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
     acc_response = requests.get(accounts_url, headers=headers, timeout=10)
     acc_response.raise_for_status()
     account_id = acc_response.json()["data"][0]["accountId"]
 
-    # Step 2: Send email using accountId
-    send_url = f"https://mail.zoho.com/api/accounts/{account_id}/messages?action=send"
+    # Step 2: Send email
+    send_url = f"{api_domain}/mail/v1/accounts/{account_id}/messages"
 
     payload = {
         "fromAddress": settings.ZOHO_FROM_EMAIL,
         "toAddress": to_email if isinstance(to_email, list) else [to_email],
         "subject": subject,
-        "content": plain_text or "",
+        "content": html_content or plain_text or "",
     }
-
-    if html_content:
-        payload["content"] = html_content
 
     email_headers = {
         "Authorization": f"Zoho-oauthtoken {access_token}",
