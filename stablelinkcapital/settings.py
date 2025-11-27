@@ -446,6 +446,14 @@ ZOHO_FROM_EMAIL = os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com")
 EMAIL_HOST_USER = ZOHO_FROM_EMAIL
 DEFAULT_FROM_EMAIL = ZOHO_FROM_EMAIL
 
+# ----------------------------
+# Zoho API credentials (from environment)
+# ----------------------------
+# ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID")
+# ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET")
+# ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN")
+# ZOHO_FROM_EMAIL = os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com")
+
 # ---------------------------------------
 # LOGGING
 # ---------------------------------------
