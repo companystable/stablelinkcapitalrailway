@@ -446,10 +446,122 @@ def withdrawal_success(request):
 
 
 
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.conf import settings
+# from django.core.mail import send_mail
+# from django.template.loader import render_to_string
+# from django.utils.html import strip_tags
+# from django.conf import settings
+
+# @login_required
+# def deposit_view(request):
+#     """ View to handle deposit functionality """
+#     if request.method == 'POST':
+#         form = DepositForm(request.POST)
+#         if form.is_valid():
+#             selected_plan = form.cleaned_data['selected_investment_plan']
+#             amount_to_deposit = form.cleaned_data['amountDeposit']
+#             coin_name = form.cleaned_data['coinName']
+#             payment_date = form.cleaned_data['paymentDate']
+#             wallet_address = form.cleaned_data['wallet_address']
+
+#             user_profile = request.user.userprofile
+#             wallet = Wallet.objects.first()
+#             wallet_name = wallet.name if wallet else 'No wallet available'
+
+#             if amount_to_deposit > selected_plan.maximum_investment:
+#                 error_message = f"The deposit amount exceeds the maximum allowed for this plan: {selected_plan.maximum_investment}."
+#                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#             try:
+#                 with transaction.atomic():
+#                     transaction_instance = Transaction.objects.create(
+#                         user=request.user,
+#                         amount=amount_to_deposit,
+#                         transaction_type='deposit',
+#                         status='pending',
+#                         description=f"Deposit of {amount_to_deposit} for {coin_name} to wallet {wallet_address}",
+#                     )
+
+#                 # -----------------------------
+#                 #  SEND DEPOSIT SUCCESS EMAIL (USER)
+#                 # -----------------------------
+#                 subject = "Deposit Request Received – EversteadInvest"
+#                 html_message = render_to_string('investment/deposit_successmail.html', {
+#                     'username': request.user.username,
+#                     'amount': amount_to_deposit,
+#                     'coin_name': coin_name,
+#                     'wallet_address': wallet_address,
+#                     'payment_date': payment_date,
+#                     'plan_name': selected_plan.name,
+#                 })
+#                 plain_message = strip_tags(html_message)
+#                 from_email = settings.DEFAULT_FROM_EMAIL
+#                 to_email = [request.user.email]
+
+#                 send_mail(
+#                     subject,
+#                     plain_message,
+#                     from_email,
+#                     to_email,
+#                     html_message=html_message
+#                 )
+
+#                 # -----------------------------
+#                 #  SEND EMAIL TO ADMIN
+#                 # -----------------------------
+#                 admin_subject = "📩 New Deposit Request Submitted"
+#                 admin_message = f"""
+# A new deposit request has been submitted.
+
+# User: {request.user.username}
+# Email: {request.user.email}
+# Plan: {selected_plan.name}
+# Amount: {amount_to_deposit}
+# Coin: {coin_name}
+# Wallet Address: {wallet_address}
+# Payment Date: {payment_date}
+
+# Please review and approve in the admin panel.
+# """
+#                 admin_email = [settings.DEFAULT_FROM_EMAIL]  # or settings.ADMIN_EMAIL if you have it
+
+#                 send_mail(
+#                     admin_subject,
+#                     admin_message,
+#                     from_email,
+#                     admin_email
+#                 )
+#                 # -----------------------------
+
+#                 success_url = (
+#                     reverse('investment:deposit_success') +
+#                     f'?deposit_amount={amount_to_deposit}&wallet_address={wallet_address}&wallet_name={wallet_name}&user_name={request.user.username}&plan_name={selected_plan.name}'
+#                 )
+#                 return redirect(success_url)
+
+#             except Exception as e:
+#                 logger.error(f"Error occurred while processing the deposit: {str(e)}")
+#                 error_message = f"An unexpected error occurred while processing your deposit: {str(e)}"
+#                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#         else:
+#             error_message = "There were errors in the form. Please correct them and try again."
+#             return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+#     else:
+#         form = DepositForm()
+
+#     return render(request, 'userprofile/dashboard.html', {'form': form})
+
+
+
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.db import transaction
+from django.contrib.auth.decorators import login_required
+from .forms import DepositForm
+from .models import Transaction, Wallet
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def deposit_view(request):
@@ -482,55 +594,10 @@ def deposit_view(request):
                     )
 
                 # -----------------------------
-                #  SEND DEPOSIT SUCCESS EMAIL (USER)
+                # Emails have been disabled
                 # -----------------------------
-                subject = "Deposit Request Received – EversteadInvest"
-                html_message = render_to_string('investment/deposit_successmail.html', {
-                    'username': request.user.username,
-                    'amount': amount_to_deposit,
-                    'coin_name': coin_name,
-                    'wallet_address': wallet_address,
-                    'payment_date': payment_date,
-                    'plan_name': selected_plan.name,
-                })
-                plain_message = strip_tags(html_message)
-                from_email = settings.DEFAULT_FROM_EMAIL
-                to_email = [request.user.email]
-
-                send_mail(
-                    subject,
-                    plain_message,
-                    from_email,
-                    to_email,
-                    html_message=html_message
-                )
-
-                # -----------------------------
-                #  SEND EMAIL TO ADMIN
-                # -----------------------------
-                admin_subject = "📩 New Deposit Request Submitted"
-                admin_message = f"""
-A new deposit request has been submitted.
-
-User: {request.user.username}
-Email: {request.user.email}
-Plan: {selected_plan.name}
-Amount: {amount_to_deposit}
-Coin: {coin_name}
-Wallet Address: {wallet_address}
-Payment Date: {payment_date}
-
-Please review and approve in the admin panel.
-"""
-                admin_email = [settings.DEFAULT_FROM_EMAIL]  # or settings.ADMIN_EMAIL if you have it
-
-                send_mail(
-                    admin_subject,
-                    admin_message,
-                    from_email,
-                    admin_email
-                )
-                # -----------------------------
+                # Previously, emails to user and admin were sent here
+                # Commented out to prevent sending emails
 
                 success_url = (
                     reverse('investment:deposit_success') +
@@ -550,6 +617,7 @@ Please review and approve in the admin panel.
         form = DepositForm()
 
     return render(request, 'userprofile/dashboard.html', {'form': form})
+
 
 
 
