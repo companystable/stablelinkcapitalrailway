@@ -23,13 +23,13 @@ def get_zoho_access_token():
 
     return js["access_token"]
 
-
+    
 
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     access_token = get_zoho_access_token()
 
-    # ✅ EU region send mail endpoint
-    url = "https://mail.zoho.eu/api/sendmail"
+    # ✅ Correct region: US (based on your token: zohoapis.com)
+    url = "https://mail.zoho.com/api/sendmail"
 
     headers = {
         "Authorization": f"Zoho-oauthtoken {access_token}"
@@ -39,8 +39,11 @@ def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
         "from": settings.ZOHO_FROM_EMAIL,
         "to": to_email if isinstance(to_email, str) else ",".join(to_email),
         "subject": subject,
-        "content": html_content or plain_text or "",
+        "content": plain_text or "",
     }
+
+    if html_content:
+        payload["content"] = html_content
 
     resp = requests.post(url, data=payload, headers=headers, timeout=10)
     resp.raise_for_status()
