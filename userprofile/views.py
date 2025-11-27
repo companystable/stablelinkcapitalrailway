@@ -176,7 +176,7 @@ def register(request):
                     subject = "Welcome to EversteadInvest"
                     html_content = render_to_string("userprofile/register_mail.html", {
                         "username": user.username,
-                        "dashboard_url": "https://www.eversteadinvest.com/userprofile/dashboard/"
+                        "dashboard_url": "https://www.stablelinkcapital.com/userprofile/dashboard/"
                     })
 
                     msg = EmailMultiAlternatives(
