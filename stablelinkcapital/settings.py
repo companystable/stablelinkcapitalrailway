@@ -297,7 +297,8 @@ SECRET_KEY = os.getenv(
 )
 
 # DEBUG
-DEBUG = os.getenv("DEBUG", "False") == "True"
+# DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "False"
 
 # Allowed hosts
 ALLOWED_HOSTS = [
