@@ -39,8 +39,8 @@
 <!-- Main CSS File -->
 <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
-<style>
-  /* Fullscreen Preloader */
+    <style>
+        /* Fullscreen Preloader */
 #preloader {
     position: fixed;
     top: 0;
@@ -50,7 +50,7 @@
     background: #060821; /* Professional dark blue */
     display: flex;
     flex-direction: column;
-    align-items: center;F
+    align-items: center;
     justify-content: center;
     z-index: 999999;
     transition: opacity 0.6s ease;
@@ -86,7 +86,7 @@
     100% { transform: rotate(360deg); }
 }
 
-</style>
+ </style>
 <style>
 .btn-getstarted i {
     margin-right: 6px;
@@ -98,6 +98,12 @@
 </head>
 
 <body class="index-page">
+  
+<!-- Preloader -->
+<div id="preloader">
+    <div class="loader-circle"></div>
+    <h2 class="loader-text">StablelinkCapital</h2>
+</div>
 
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -1572,11 +1578,6 @@
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Preloader -->
-   <div id="preloader">
-    <div class="loader-circle"></div>
-    <h2 class="loader-text">StablelinkCapital</h2>
-</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
