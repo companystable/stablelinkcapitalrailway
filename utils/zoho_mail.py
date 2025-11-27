@@ -17,18 +17,21 @@ def get_zoho_access_token():
 
 def send_zoho_email(to_email, subject, html_content=None, plain_text=None):
     access_token = get_zoho_access_token()
-    url = url = "https://mail.zoho.eu/api/sendmail"
+
+    # ✅ Correct region: US
+    url = "https://mail.zoho.com/api/sendmail"
 
     headers = {
         "Authorization": f"Zoho-oauthtoken {access_token}"
     }
-    # Zoho supports form encoded fields for simple sends
+
     payload = {
         "from": settings.ZOHO_FROM_EMAIL,
         "to": to_email if isinstance(to_email, str) else ",".join(to_email),
         "subject": subject,
         "content": plain_text or "",
     }
+
     if html_content:
         payload["content"] = html_content
 
