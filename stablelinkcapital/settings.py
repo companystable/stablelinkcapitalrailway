@@ -425,12 +425,12 @@ else:
 # ---------------------------------------
 # EMAIL (placeholder)
 # ---------------------------------------
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.zoho.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# Zoho API credentials
+ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID", "")
+ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET", "")
+ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN", "")   # will add later
+ZOHO_FROM_EMAIL = os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@stablelinkcapital.com")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # ---------------------------------------
