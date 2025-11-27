@@ -426,12 +426,25 @@ else:
 # EMAIL (placeholder)
 # ---------------------------------------
 # Zoho API credentials
-ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID", "")
-ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET", "")
-ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN", "")   # will add later
+# ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID", "")
+# ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET", "")
+# ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN", "")   # will add later
+# ZOHO_FROM_EMAIL = os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com")
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@stablelinkcapital.com")
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# Zoho API credentials
+ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID")
+ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET")
+ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN")
+
+# Sender email for Zoho Mail API
 ZOHO_FROM_EMAIL = os.getenv("ZOHO_FROM_EMAIL", "support@stablelinkcapital.com")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@stablelinkcapital.com")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Django defaults
+EMAIL_HOST_USER = ZOHO_FROM_EMAIL
+DEFAULT_FROM_EMAIL = ZOHO_FROM_EMAIL
 
 # ---------------------------------------
 # LOGGING
