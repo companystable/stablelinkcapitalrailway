@@ -10,9 +10,6 @@ urlpatterns = [
     path('userprofile/', include('userprofile.urls')),
     path('investment/', include('investment.urls')),
     path('connectwallet/', include('connectwallet.urls')),
-
-    # Correct
-    path('zoho/oauth/callback/', zoho_oauth_callback, name='zoho_oauth_callback'),
 ]
 
 if settings.DEBUG:
