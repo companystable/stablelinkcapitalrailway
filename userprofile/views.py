@@ -271,7 +271,7 @@ def register(request):
 
 #                 # Send welcome email using HTML template
 #                 try:
-#                     subject = "Welcome to EversteadInvest"
+#                     subject = "Welcome to Stablelinkcapital"
 #                     html_content = render_to_string("userprofile/register_mail.html", {
 #                         "username": user.username,
 #                         "dashboard_url": "https://www.stablelinkcapital.com/userprofile/dashboard/"

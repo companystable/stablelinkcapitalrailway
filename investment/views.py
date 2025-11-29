@@ -611,7 +611,7 @@ from django.conf import settings
 #                 # -----------------------------
 #                 #  SEND DEPOSIT SUCCESS EMAIL (USER)
 #                 # -----------------------------
-#                 subject = "Deposit Request Received – EversteadInvest"
+#                 subject = "Deposit Request Received – Stablelinkcapital"
 #                 html_message = render_to_string('investment/deposit_successmail.html', {
 #                     'username': request.user.username,
 #                     'amount': amount_to_deposit,
@@ -718,7 +718,7 @@ def deposit_view(request):
                 #  SEND DEPOSIT SUCCESS EMAIL TO USER (Resend API)
                 # ---------------------------------------------------------
                 try:
-                    subject = "Deposit Request Received – EversteadInvest"
+                    subject = "Deposit Request Received – Stablelinkcapital"
 
                     html_message = render_to_string(
                         'investment/deposit_successmail.html',
@@ -951,7 +951,7 @@ from django.db import transaction as db_transaction
 #             message=f"Hello {transaction.user.username},\n\n"
 #                     f"Your deposit of ${transaction.amount} has been approved.\n"
 #                     f"You can now see it reflected in your dashboard.\n\n"
-#                     f"Best regards,\nEversteadInvest Team",
+#                     f"Best regards,\nStablelinkcapital Team",
 #             from_email=settings.DEFAULT_FROM_EMAIL,
 #             recipient_list=[transaction.user.email],
 #             fail_silently=True
