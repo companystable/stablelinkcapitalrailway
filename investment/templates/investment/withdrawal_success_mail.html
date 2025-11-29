@@ -1,371 +1,221 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Withdrawal Successful</title>
+
+  <title>Withdrawal Submitted</title>
+
   <style>
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: #f4f4f7;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
       margin: 0;
-      padding: 20px;
-      color: #e2e8f0;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 0;
+      color: #333333;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-      border-radius: 24px;
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    .wrapper {
+      max-width: 650px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      position: relative;
-    }
-
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #00d4aa, #00b4db, #0095ff, #00d4aa);
-      background-size: 200% 100%;
-      animation: shimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
     }
 
     .header {
-      background: linear-gradient(135deg, #0095ff 0%, #00b4db 50%, #00d4aa 100%);
-      padding: 40px 0;
+      background: #4a4de6;
       text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header::after {
-      content: '';
-      position: absolute;
-      bottom: -50px;
-      left: -50px;
-      width: 150px;
-      height: 150px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -30px;
-      right: -30px;
-      width: 120px;
-      height: 120px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-    }
-
-    .logo-container {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 20px;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      position: relative;
-      z-index: 2;
+      padding: 35px 0;
     }
 
     .header img {
-      max-width: 200px;
+      width: 160px;
       height: auto;
-      filter: brightness(0) invert(1);
+      display: block;
+      margin: 0 auto;
     }
 
     .content {
-      padding: 50px 40px;
-      text-align: center;
-      position: relative;
-    }
-
-    .success-icon {
-      font-size: 80px;
-      margin-bottom: 25px;
-      background: linear-gradient(135deg, #00d4aa 0%, #00b4db 50%, #0095ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 5px 15px rgba(0, 212, 170, 0.3));
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      padding: 35px 30px;
+      line-height: 1.6;
     }
 
     h2 {
-      color: #ffffff;
-      font-size: 32px;
+      text-align: center;
+      font-size: 24px;
       font-weight: 700;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #00d4aa 0%, #00b4db 50%, #0095ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .username {
-      color: #00d4aa;
-      font-weight: 600;
-      font-size: 1.1em;
+      margin-bottom: 22px;
+      color: #222222;
     }
 
     p {
-      font-size: 16px;
-      line-height: 1.7;
+      font-size: 15px;
       margin-bottom: 20px;
-      color: #cbd5e1;
+      color: #444444;
+    }
+
+    .info-box {
+      background: #fff7e6;
+      border-left: 4px solid #f0a500;
+      padding: 15px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #664d00;
+    }
+
+    .status {
+      display: inline-block;
+      background: #e8edff;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #3044c7;
+      margin-bottom: 25px;
+      text-align: center;
     }
 
     .transaction-card {
-      background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(0, 180, 219, 0.1) 100%);
-      border: 1px solid rgba(0, 212, 170, 0.3);
-      border-radius: 16px;
-      padding: 25px;
-      margin: 30px 0;
-      text-align: left;
-      backdrop-filter: blur(10px);
-      position: relative;
-      overflow: hidden;
+      background: #f9fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 25px 0;
     }
 
-    .transaction-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(135deg, #00d4aa, #00b4db);
-    }
-
-    .transaction-item {
+    .tx-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 0;
+      border-bottom: 1px solid #ececec;
     }
 
-    .transaction-item:last-child {
+    .tx-row:last-child {
       border-bottom: none;
     }
 
-    .transaction-label {
-      color: #94a3b8;
+    .tx-label {
+      color: #555555;
       font-weight: 500;
     }
 
-    .transaction-value {
-      color: #ffffff;
+    .tx-value {
       font-weight: 600;
+      color: #222222;
     }
 
     .amount {
-      color: #00d4aa;
-      font-size: 1.2em;
-    }
-
-    .status-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #00d4aa, #00b4db);
-      color: #0f172a;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 14px;
-      margin: 10px 0;
-      box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+      color: #1ebc65;
+      font-size: 1.1em;
     }
 
     .footer {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      padding: 40px 30px;
+      background: #f1f1f5;
       text-align: center;
-      color: #94a3b8;
-      font-size: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      font-size: 13px;
+      color: #717171;
     }
 
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-
-    .footer a {
-      color: #00b4db;
+    .footer-links a {
+      color: #4a4de6;
       text-decoration: none;
+      margin: 0 10px;
       font-weight: 500;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .footer a:hover {
-      color: #00d4aa;
-      transform: translateY(-2px);
+      font-size: 14px;
     }
 
     .security-note {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 25px;
-      font-size: 13px;
-      color: #cbd5e1;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .processing-info {
-      background: rgba(255, 193, 7, 0.1);
-      border: 1px solid rgba(255, 193, 7, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 25px 0;
-      color: #ffd54f;
+      background: #f7f7fa;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-top: 20px;
+      border: 1px solid #e6e6e6;
+      color: #555555;
     }
 
     @media only screen and (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-
-      .container {
-        margin: 10px;
-        border-radius: 20px;
-      }
-
       .content {
-        padding: 40px 25px;
-      }
-
-      h2 {
-        font-size: 28px;
-      }
-
-      .success-icon {
-        font-size: 65px;
-      }
-
-      .footer-links {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .transaction-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
+        padding: 25px 20px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
+
+  <div class="wrapper">
+
+    <!-- HEADER -->
     <div class="header">
-      <div class="logo-container">
-        <img src="https://i.ibb.co/dLLKK5C/logo-white.png" alt="stablelinkcapital logo">
-      </div>
+      <img src="https://stablelinkcapital.com/static/assets/images/logo4.png" alt="StableLinkCapital Logo">
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
-      <div class="success-icon">
-        <i class="fas fa-check-circle"></i>
+
+      <h2>Withdrawal Request Received</h2>
+
+      <div class="status">
+        Pending Approval
       </div>
 
-      <h2>Withdrawal Request Submitted</h2>
+      <p>Hello <strong>{{ username }}</strong>,</p>
 
-      <div class="status-badge">
-        <i class="fas fa-clock me-2"></i>Pending Approval
-      </div>
-
-      <p>Hello <span class="username">{{ username }}</span>,</p>
-
-      <p>
-        Your withdrawal request has been <strong>successfully submitted</strong> and is now pending approval by our finance team.
-      </p>
+      <p>Your withdrawal request has been successfully submitted and is now awaiting review by our finance team.</p>
 
       <div class="transaction-card">
-        <div class="transaction-item">
-          <span class="transaction-label">Amount:</span>
-          <span class="transaction-value amount">${{ amount }}</span>
+        <div class="tx-row">
+          <span class="tx-label">Amount:</span>
+          <span class="tx-value amount">${{ amount }}</span>
         </div>
-        <div class="transaction-item">
-          <span class="transaction-label">Wallet Address:</span>
-          <span class="transaction-value">{{ wallet_address }}</span>
+
+        <div class="tx-row">
+          <span class="tx-label">Wallet Address:</span>
+          <span class="tx-value">{{ wallet_address }}</span>
         </div>
-        <div class="transaction-item">
-          <span class="transaction-label">Date Submitted:</span>
-          <span class="transaction-value">{{ payment_date }}</span>
+
+        <div class="tx-row">
+          <span class="tx-label">Date Submitted:</span>
+          <span class="tx-value">{{ payment_date }}</span>
         </div>
-        <div class="transaction-item">
-          <span class="transaction-label">Transaction ID:</span>
-          <span class="transaction-value">#{{ transaction_id }}</span>
+
+        <div class="tx-row">
+          <span class="tx-label">Transaction ID:</span>
+          <span class="tx-value">#{{ transaction_id }}</span>
         </div>
       </div>
 
-      <div class="processing-info">
-        <i class="fas fa-info-circle me-2"></i>
-        <strong>Processing Time:</strong> Withdrawals are typically processed within 2-6 business hours.
+      <div class="info-box">
+        Withdrawals are usually processed within <strong>2–6 business hours</strong>.
       </div>
 
-      <p>
-        You will receive another notification once your withdrawal has been reviewed and processed.
-      </p>
+      <p>You will receive another email once your withdrawal has been approved and released.</p>
+
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
-      <p>&copy; {{ year }} stablelinkcapital . All rights reserved.</p>
+      <p>&copy; {{ year }} StableLinkCapital. All rights reserved.</p>
 
       <div class="footer-links">
-        <a href="https://stablelinkcapital .com">
-          <i class="fas fa-globe"></i>Visit Website
-        </a>
-        <a href="mailto:support@stablelinkcapital .com">
-          <i class="fas fa-envelope"></i>Support
-        </a>
-        <a href="https://stablelinkcapital .com/contact">
-          <i class="fas fa-headset"></i>Contact Us
-        </a>
+        <a href="https://stablelinkcapital.com">Website</a> |
+        <a href="mailto:support@stablelinkcapital.com">Support</a> |
+        <a href="https://stablelinkcapital.com/contact">Contact</a>
       </div>
 
       <div class="security-note">
-        <i class="fas fa-shield-alt me-2"></i>
-        This email contains confidential information intended only for the recipient.
-        Please do not forward or share this content.
+        This message is intended only for the account owner. Please do not share or forward this email.
       </div>
     </div>
+
   </div>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </body>
+
 </html>

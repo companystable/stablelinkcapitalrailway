@@ -177,7 +177,7 @@ def register(request):
                 # ✅ SEND WELCOME EMAIL USING RESEND API
                 # -----------------------------------------------
                 try:
-                    subject = "Welcome to EversteadInvest"
+                    subject = "Welcome to Stablelinkcapitalinvest"
                     html_content = render_to_string(
                         "userprofile/register_mail.html",
                         {

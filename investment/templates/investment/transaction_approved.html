@@ -1,134 +1,157 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Deposit Approved</title>
 
   <style>
-    body { 
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-      background: #0a0d1a; 
-      margin: 0; padding: 0; 
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f4f4f7;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #333333;
     }
 
-    .container { 
-      max-width: 650px; 
-      margin: 40px auto; 
-      background: #101427; 
-      border-radius: 14px; 
-      border: 1px solid rgba(255,255,255,0.08); 
-      overflow: hidden; 
-      box-shadow: 0 0 25px rgba(0,0,0,0.35); 
+    .wrapper {
+      max-width: 650px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e2e2;
+      overflow: hidden;
     }
 
-    /* HEADER WITH BRAND COLOR */
-    .header { 
-      background: linear-gradient(135deg, #1ebc65 0%, #6959ed 100%); 
-      padding: 35px 0; 
-      text-align: center; 
+    .header {
+      background: #4a4de6;
+      text-align: center;
+      padding: 32px 20px;
     }
 
-    .header img { 
-      max-width: 160px; 
-      filter: brightness(0) invert(1); 
+    .header img {
+      width: 160px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
 
-    h2 { 
-      margin-top: 25px; 
-      color: #e5e7f4; 
-      text-align: center; 
-      font-size: 26px; 
-      font-weight: 700; 
+    .content {
+      padding: 35px 30px;
+      line-height: 1.6;
     }
 
-    .content { 
-      padding: 40px; 
-      color: #cbd5e0; 
+    h2 {
+      color: #222222;
+      font-size: 24px;
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 20px;
     }
 
-    p { 
-      font-size: 16px; 
-      color: #cbd5e0; 
-      line-height: 1.7; 
-      margin-bottom: 22px; 
+    p {
+      font-size: 15px;
+      color: #444444;
+      margin-bottom: 20px;
     }
 
-    /* LIGHT GREEN INFO BOX FOR SUCCESS */
-    .info-box { 
-      background: rgba(30,188,101,0.1); 
-      border-left: 4px solid #1ebc65; 
-      padding: 20px; 
-      border-radius: 10px; 
-      margin-bottom: 25px; 
+    .info-box {
+      background: #e8f6ef;
+      border-left: 4px solid #1ebc65;
+      padding: 18px;
+      border-radius: 8px;
+      margin: 25px 0;
     }
 
-    /* BRAND BUTTON */
-    .button { 
-      display: inline-block; 
-      background: linear-gradient(135deg, #1ebc65 0%, #6959ed 100%); 
-      color: #ffffff; 
-      padding: 15px 38px; 
-      border-radius: 10px; 
-      font-size: 16px; 
-      font-weight: 600; 
-      text-decoration: none; 
-      margin: 30px auto; 
-      text-align: center; 
-      box-shadow: 0 4px 14px rgba(105,89,237,0.3); 
+    .info-box p {
+      margin: 8px 0;
+      color: #1a1a1a;
+      font-size: 15px;
     }
 
-    .footer { 
-      background: #0d111f; 
-      padding: 25px; 
-      text-align: center; 
-      color: #7f8ca8; 
-      font-size: 14px; 
-      border-top: 1px solid rgba(255,255,255,0.08);
+    .btn-area {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .button {
+      background: #4a4de6;
+      padding: 14px 32px;
+      border-radius: 8px;
+      color: #ffffff !important;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .footer {
+      background: #f0f0f5;
+      padding: 25px;
+      text-align: center;
+      font-size: 14px;
+      color: #6f6f6f;
+    }
+
+    .footer p {
+      margin: 5px 0;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
 
+  <div class="wrapper">
+
+    <!-- HEADER -->
     <div class="header">
-      <img src="https://i.ibb.co/dLLKK5C/logo-white.png" alt="StablelinkCapital Logo">
+      <img 
+        src="https://stablelinkcapital.com/static/assets/images/logo4.png" 
+        alt="StableLinkCapital Logo"
+      >
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
 
-      <h2>Deposit Approved 🎉</h2>
+      <h2>Your Deposit Has Been Approved</h2>
 
       <p>Hello <strong>{{ username }}</strong>,</p>
 
-      <p>Your deposit has been 
-        <strong style="color: #1ebc65;">successfully approved</strong> and added to your account.
+      <p>
+        We’re pleased to inform you that your recent deposit has been 
+        <strong style="color:#1ebc65;">successfully approved</strong> and added to your account balance.
       </p>
 
       <div class="info-box">
         <p><strong>Deposit Details</strong></p>
         <p>💰 Amount: <strong>${{ amount }}</strong></p>
         <p>📝 Transaction ID: <strong>{{ transaction_id }}</strong></p>
-        <p>📅 Date Approved: <strong>{{ approval_date }}</strong></p>
+        <p>📅 Approved On: <strong>{{ approval_date }}</strong></p>
       </div>
 
-      <div style="text-align:center;">
-        <a href="https://www.stablelinkcapital.com/userprofile/dashboard/" class="button">
-          Go to Dashboard
+      <div class="btn-area">
+        <a href="https://stablelinkcapital.com/userprofile/dashboard/" class="button">
+          View Your Dashboard
         </a>
       </div>
 
-      <p>If you did not authorize this deposit, please contact support immediately.</p>
+      <p>
+        If you did not authorize this deposit, please contact our support team immediately.
+      </p>
 
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
-      <p>&copy; StablelinkCapital. All rights reserved.</p>
-      <p>This is an automated message — please do not reply.</p>
+      <p>&copy; 2025 StableLinkCapital. All rights reserved.</p>
+      <p>This is an automated notification — please do not reply.</p>
     </div>
 
   </div>
+
 </body>
+
 </html>
