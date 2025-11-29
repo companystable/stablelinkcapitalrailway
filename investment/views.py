@@ -87,6 +87,8 @@ from .models import Transaction
 import logging
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, redirect
+from utils.email_utils import send_resend_email
+
 
 
 
@@ -99,6 +101,112 @@ from django.shortcuts import get_object_or_404, redirect
 
 logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
+
+# @login_required
+# def withdrawal_view(request):
+#     """ View to handle withdrawal functionality from return_of_investment """
+#     if request.method == 'POST':
+#         form = WithdrawalForm(request.POST)
+#         if form.is_valid():
+#             amount_to_withdraw = form.cleaned_data['amountWithdraw']
+#             wallet_address = form.cleaned_data['wallet_address']
+#             payment_date = form.cleaned_data['paymentDate']
+
+#             user_profile = request.user.userprofile
+
+#             # Check ROI balance
+#             if user_profile.return_of_investment >= amount_to_withdraw:
+#                 try:
+#                     with transaction.atomic():
+
+#                         # 1. Deduct balance
+#                         user_profile.return_of_investment -= amount_to_withdraw
+#                         user_profile.save()
+
+#                         # 2. Create a transaction record
+#                         transaction_record = Transaction.objects.create(
+#                             user=request.user,
+#                             amount=amount_to_withdraw,
+#                             transaction_type='withdrawal',
+#                             status='pending',
+#                             description=f"Withdrawal of {amount_to_withdraw} to wallet {wallet_address}",
+#                         )
+
+#                         # 3. Send success email to USER
+#                         try:
+#                             subject = "Withdrawal Request Submitted Successfully"
+#                             from_email = settings.DEFAULT_FROM_EMAIL
+#                             recipient = [request.user.email]
+
+#                             html_content = render_to_string(
+#                                 'investment/withdrawal_success_mail.html',
+#                                 {
+#                                     'username': request.user.username,
+#                                     'amount': amount_to_withdraw,
+#                                     'wallet_address': wallet_address,
+#                                 }
+#                             )
+
+#                             msg = EmailMultiAlternatives(subject, "", from_email, recipient)
+#                             msg.attach_alternative(html_content, "text/html")
+#                             msg.send()
+
+#                         except Exception as email_error:
+#                             logger.error(f"Email sending failed: {email_error}")
+
+#                         # 4. Send email to ADMIN
+#                         try:
+#                             admin_subject = "📤 New Withdrawal Request Submitted"
+#                             admin_message = f"""
+# A new withdrawal request has been submitted.
+
+# User: {request.user.username}
+# Email: {request.user.email}
+# Amount: {amount_to_withdraw}
+# Wallet Address: {wallet_address}
+# Payment Date: {payment_date}
+
+# Please review and process this request in the admin panel.
+# """
+
+#                             admin_email = [settings.DEFAULT_FROM_EMAIL]  # Or use settings.ADMIN_EMAIL
+
+#                             send_mail(
+#                                 admin_subject,
+#                                 admin_message,
+#                                 from_email,
+#                                 admin_email
+#                             )
+
+#                         except Exception as admin_email_error:
+#                             logger.error(f"Admin email sending failed: {admin_email_error}")
+
+#                     # Redirect to success page
+#                     success_url = (
+#                         reverse('investment:withdrawal_success') +
+#                         f"?amount_withdrawn={amount_to_withdraw}&wallet_address={wallet_address}&user_name={request.user.username}"
+#                     )
+#                     return redirect(success_url)
+
+#                 except Exception as e:
+#                     error_message = f"An unexpected error occurred during the withdrawal process: {str(e)}"
+#                     logger.error(error_message)
+#                     return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#             else:
+#                 # Insufficient balance
+#                 error_message = "Insufficient return on investment (ROI) for the withdrawal."
+#                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#         else:
+#             error_message = "Please correct the errors in the withdrawal form."
+#             return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#     else:
+#         form = WithdrawalForm()
+
+#     return render(request, 'userprofile/dashboard.html', {'form': form})
+
 
 @login_required
 def withdrawal_view(request):
@@ -130,11 +238,11 @@ def withdrawal_view(request):
                             description=f"Withdrawal of {amount_to_withdraw} to wallet {wallet_address}",
                         )
 
-                        # 3. Send success email to USER
+                        # ---------------------------------------------------
+                        # 3. SEND USER EMAIL (Resend API)
+                        # ---------------------------------------------------
                         try:
                             subject = "Withdrawal Request Submitted Successfully"
-                            from_email = settings.DEFAULT_FROM_EMAIL
-                            recipient = [request.user.email]
 
                             html_content = render_to_string(
                                 'investment/withdrawal_success_mail.html',
@@ -145,39 +253,53 @@ def withdrawal_view(request):
                                 }
                             )
 
-                            msg = EmailMultiAlternatives(subject, "", from_email, recipient)
-                            msg.attach_alternative(html_content, "text/html")
-                            msg.send()
+                            send_resend_email(
+                                to=request.user.email,
+                                subject=subject,
+                                html=html_content
+                            )
+
+                            logger.info(
+                                f"[EMAIL SENT] Withdrawal confirmation sent to {request.user.email} via Resend"
+                            )
 
                         except Exception as email_error:
-                            logger.error(f"Email sending failed: {email_error}")
+                            logger.error(
+                                f"[EMAIL ERROR] Failed to send withdrawal confirmation email via Resend: {email_error}",
+                                exc_info=True
+                            )
 
-                        # 4. Send email to ADMIN
+                        # ---------------------------------------------------
+                        # 4. SEND ADMIN EMAIL (Resend API)
+                        # ---------------------------------------------------
                         try:
-                            admin_subject = "📤 New Withdrawal Request Submitted"
-                            admin_message = f"""
-A new withdrawal request has been submitted.
+                            admin_subject = "New Withdrawal Request Submitted"
 
-User: {request.user.username}
-Email: {request.user.email}
-Amount: {amount_to_withdraw}
-Wallet Address: {wallet_address}
-Payment Date: {payment_date}
+                            admin_html = (
+                                f"<h3>New Withdrawal Request</h3>"
+                                f"<p><strong>User:</strong> {request.user.username}</p>"
+                                f"<p><strong>Email:</strong> {request.user.email}</p>"
+                                f"<p><strong>Amount:</strong> {amount_to_withdraw}</p>"
+                                f"<p><strong>Wallet Address:</strong> {wallet_address}</p>"
+                                f"<p><strong>Payment Date:</strong> {payment_date}</p>"
+                                f"<p>Please review and process the request in the admin panel.</p>"
+                            )
 
-Please review and process this request in the admin panel.
-"""
+                            send_resend_email(
+                                to=settings.ADMIN_EMAIL,
+                                subject=admin_subject,
+                                html=admin_html
+                            )
 
-                            admin_email = [settings.DEFAULT_FROM_EMAIL]  # Or use settings.ADMIN_EMAIL
-
-                            send_mail(
-                                admin_subject,
-                                admin_message,
-                                from_email,
-                                admin_email
+                            logger.info(
+                                f"[EMAIL SENT] Admin withdrawal alert sent to {settings.ADMIN_EMAIL} via Resend"
                             )
 
                         except Exception as admin_email_error:
-                            logger.error(f"Admin email sending failed: {admin_email_error}")
+                            logger.error(
+                                f"[ADMIN EMAIL ERROR] Failed sending admin withdrawal notification via Resend: {admin_email_error}",
+                                exc_info=True
+                            )
 
                     # Redirect to success page
                     success_url = (
@@ -187,7 +309,9 @@ Please review and process this request in the admin panel.
                     return redirect(success_url)
 
                 except Exception as e:
-                    error_message = f"An unexpected error occurred during the withdrawal process: {str(e)}"
+                    error_message = (
+                        f"An unexpected error occurred during the withdrawal process: {str(e)}"
+                    )
                     logger.error(error_message)
                     return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
 
@@ -306,6 +430,9 @@ def withdrawal_success(request):
 #         form = DepositForm()
 
 #     return render(request, 'userprofile/dashboard.html', {'form': form})
+
+
+
 
 
 # @login_required
@@ -446,10 +573,10 @@ def withdrawal_success(request):
 
 
 
-# from django.core.mail import send_mail
-# from django.template.loader import render_to_string
-# from django.utils.html import strip_tags
-# from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 
 # @login_required
 # def deposit_view(request):
@@ -553,15 +680,6 @@ def withdrawal_success(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
-from .forms import DepositForm
-from .models import Transaction, Wallet
-import logging
-
-logger = logging.getLogger(__name__)
 
 @login_required
 def deposit_view(request):
@@ -580,7 +698,10 @@ def deposit_view(request):
             wallet_name = wallet.name if wallet else 'No wallet available'
 
             if amount_to_deposit > selected_plan.maximum_investment:
-                error_message = f"The deposit amount exceeds the maximum allowed for this plan: {selected_plan.maximum_investment}."
+                error_message = (
+                    f"The deposit amount exceeds the maximum allowed for this plan: "
+                    f"{selected_plan.maximum_investment}."
+                )
                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
 
             try:
@@ -593,15 +714,81 @@ def deposit_view(request):
                         description=f"Deposit of {amount_to_deposit} for {coin_name} to wallet {wallet_address}",
                     )
 
-                # -----------------------------
-                # Emails have been disabled
-                # -----------------------------
-                # Previously, emails to user and admin were sent here
-                # Commented out to prevent sending emails
+                # ---------------------------------------------------------
+                #  SEND DEPOSIT SUCCESS EMAIL TO USER (Resend API)
+                # ---------------------------------------------------------
+                try:
+                    subject = "Deposit Request Received – EversteadInvest"
+
+                    html_message = render_to_string(
+                        'investment/deposit_successmail.html',
+                        {
+                            'username': request.user.username,
+                            'amount': amount_to_deposit,
+                            'coin_name': coin_name,
+                            'wallet_address': wallet_address,
+                            'payment_date': payment_date,
+                            'plan_name': selected_plan.name,
+                        }
+                    )
+
+                    send_resend_email(
+                        to=request.user.email,
+                        subject=subject,
+                        html=html_message
+                    )
+
+                    logger.info(
+                        f"[EMAIL SENT] Deposit confirmation sent to {request.user.email} via Resend"
+                    )
+
+                except Exception as email_error:
+                    logger.error(
+                        f"[EMAIL ERROR] User deposit email via Resend failed: {email_error}",
+                        exc_info=True
+                    )
+
+                # ---------------------------------------------------------
+                #  SEND ADMIN EMAIL (Resend API)
+                # ---------------------------------------------------------
+                try:
+                    admin_subject = "New Deposit Request Submitted"
+
+                    admin_html = (
+                        f"<h3>New Deposit Request</h3>"
+                        f"<p><strong>User:</strong> {request.user.username}</p>"
+                        f"<p><strong>Email:</strong> {request.user.email}</p>"
+                        f"<p><strong>Plan:</strong> {selected_plan.name}</p>"
+                        f"<p><strong>Amount:</strong> {amount_to_deposit}</p>"
+                        f"<p><strong>Coin:</strong> {coin_name}</p>"
+                        f"<p><strong>Wallet:</strong> {wallet_address}</p>"
+                        f"<p><strong>Payment Date:</strong> {payment_date}</p>"
+                        f"<p>Please review and approve in the admin panel.</p>"
+                    )
+
+                    send_resend_email(
+                        to=settings.ADMIN_EMAIL,
+                        subject=admin_subject,
+                        html=admin_html
+                    )
+
+                    logger.info(
+                        f"[EMAIL SENT] Admin deposit alert sent to {settings.ADMIN_EMAIL} via Resend"
+                    )
+
+                except Exception as admin_email_error:
+                    logger.error(
+                        f"[ADMIN EMAIL ERROR] Admin deposit email via Resend failed: {admin_email_error}",
+                        exc_info=True
+                    )
+
+                # ---------------------------------------------------------
 
                 success_url = (
                     reverse('investment:deposit_success') +
-                    f'?deposit_amount={amount_to_deposit}&wallet_address={wallet_address}&wallet_name={wallet_name}&user_name={request.user.username}&plan_name={selected_plan.name}'
+                    f'?deposit_amount={amount_to_deposit}&wallet_address={wallet_address}'
+                    f'&wallet_name={wallet_name}&user_name={request.user.username}'
+                    f'&plan_name={selected_plan.name}'
                 )
                 return redirect(success_url)
 
@@ -617,6 +804,73 @@ def deposit_view(request):
         form = DepositForm()
 
     return render(request, 'userprofile/dashboard.html', {'form': form})
+
+
+
+# from django.shortcuts import render, redirect
+# from django.urls import reverse
+# from django.db import transaction
+# from django.contrib.auth.decorators import login_required
+# from .forms import DepositForm
+# from .models import Transaction, Wallet
+# import logging
+
+# logger = logging.getLogger(__name__)
+
+# @login_required
+# def deposit_view(request):
+#     """ View to handle deposit functionality """
+#     if request.method == 'POST':
+#         form = DepositForm(request.POST)
+#         if form.is_valid():
+#             selected_plan = form.cleaned_data['selected_investment_plan']
+#             amount_to_deposit = form.cleaned_data['amountDeposit']
+#             coin_name = form.cleaned_data['coinName']
+#             payment_date = form.cleaned_data['paymentDate']
+#             wallet_address = form.cleaned_data['wallet_address']
+
+#             user_profile = request.user.userprofile
+#             wallet = Wallet.objects.first()
+#             wallet_name = wallet.name if wallet else 'No wallet available'
+
+#             if amount_to_deposit > selected_plan.maximum_investment:
+#                 error_message = f"The deposit amount exceeds the maximum allowed for this plan: {selected_plan.maximum_investment}."
+#                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#             try:
+#                 with transaction.atomic():
+#                     transaction_instance = Transaction.objects.create(
+#                         user=request.user,
+#                         amount=amount_to_deposit,
+#                         transaction_type='deposit',
+#                         status='pending',
+#                         description=f"Deposit of {amount_to_deposit} for {coin_name} to wallet {wallet_address}",
+#                     )
+
+#                 # -----------------------------
+#                 # Emails have been disabled
+#                 # -----------------------------
+#                 # Previously, emails to user and admin were sent here
+#                 # Commented out to prevent sending emails
+
+#                 success_url = (
+#                     reverse('investment:deposit_success') +
+#                     f'?deposit_amount={amount_to_deposit}&wallet_address={wallet_address}&wallet_name={wallet_name}&user_name={request.user.username}&plan_name={selected_plan.name}'
+#                 )
+#                 return redirect(success_url)
+
+#             except Exception as e:
+#                 logger.error(f"Error occurred while processing the deposit: {str(e)}")
+#                 error_message = f"An unexpected error occurred while processing your deposit: {str(e)}"
+#                 return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#         else:
+#             error_message = "There were errors in the form. Please correct them and try again."
+#             return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+#     else:
+#         form = DepositForm()
+
+#     return render(request, 'userprofile/dashboard.html', {'form': form})
 
 
 
@@ -667,6 +921,64 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db import transaction as db_transaction
 
+# @staff_member_required
+# def approve_transaction_view(request, transaction_id):
+#     """ Admin view to approve a pending transaction and update the user's balance """
+
+#     # Get the transaction object
+#     transaction = get_object_or_404(Transaction, id=transaction_id)
+
+#     if transaction.status != 'pending':
+#         error_message = "This transaction has already been processed or is not in pending status."
+#         return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+#     try:
+#         with db_transaction.atomic():
+#             # Get the user's profile
+#             user_profile = transaction.user.userprofile
+
+#             # Update user balance
+#             user_profile.balance += transaction.amount
+#             user_profile.save()
+
+#             # Approve the transaction
+#             transaction.status = 'approved'
+#             transaction.save()
+
+#         # 1️⃣ SEND EMAIL TO USER
+#         send_mail(
+#             subject="Your Deposit Has Been Approved",
+#             message=f"Hello {transaction.user.username},\n\n"
+#                     f"Your deposit of ${transaction.amount} has been approved.\n"
+#                     f"You can now see it reflected in your dashboard.\n\n"
+#                     f"Best regards,\nEversteadInvest Team",
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             recipient_list=[transaction.user.email],
+#             fail_silently=True
+#         )
+
+#         # 2️⃣ SEND EMAIL TO ADMIN
+#         send_mail(
+#             subject="Transaction Approved (Admin Notification)",
+#             message=f"Admin,\n\nA transaction has just been approved.\n\n"
+#                     f"User: {transaction.user.username}\n"
+#                     f"Amount: ${transaction.amount}\n"
+#                     f"Transaction ID: {transaction.id}\n",
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             recipient_list=[settings.ADMIN_EMAIL],
+#             fail_silently=True
+#         )
+
+#         # Redirect to success page
+#         success_url = reverse('investment:transaction_approved') + f'?transaction_id={transaction.id}'
+#         return redirect(success_url)
+
+#     except Exception as e:
+#         error_message = f"An error occurred while processing the approval: {str(e)}"
+#         return redirect(reverse('investment:error_view') + f'?error_message={error_message}')
+
+
+
 @staff_member_required
 def approve_transaction_view(request, transaction_id):
     """ Admin view to approve a pending transaction and update the user's balance """
@@ -691,29 +1003,52 @@ def approve_transaction_view(request, transaction_id):
             transaction.status = 'approved'
             transaction.save()
 
-        # 1️⃣ SEND EMAIL TO USER
-        send_mail(
-            subject="Your Deposit Has Been Approved",
-            message=f"Hello {transaction.user.username},\n\n"
-                    f"Your deposit of ${transaction.amount} has been approved.\n"
-                    f"You can now see it reflected in your dashboard.\n\n"
-                    f"Best regards,\nEversteadInvest Team",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[transaction.user.email],
-            fail_silently=True
-        )
+        # ---------------------------------------------------------
+        # 1️⃣ SEND EMAIL TO USER (Resend API)
+        # ---------------------------------------------------------
+        try:
+            subject = "Your Deposit Has Been Approved"
 
-        # 2️⃣ SEND EMAIL TO ADMIN
-        send_mail(
-            subject="Transaction Approved (Admin Notification)",
-            message=f"Admin,\n\nA transaction has just been approved.\n\n"
-                    f"User: {transaction.user.username}\n"
-                    f"Amount: ${transaction.amount}\n"
-                    f"Transaction ID: {transaction.id}\n",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.ADMIN_EMAIL],
-            fail_silently=True
-        )
+            html_content = f"""
+                <h3>Deposit Approved</h3>
+                <p>Hello {transaction.user.username},</p>
+                <p>Your deposit of <strong>${transaction.amount}</strong> has been approved.</p>
+                <p>You can now see it reflected in your dashboard.</p>
+                <br>
+                <p>Best regards,<br>StableLink Capital Team</p>
+            """
+
+            send_resend_email(
+                to=transaction.user.email,
+                subject=subject,
+                html=html_content
+            )
+
+        except Exception as email_error:
+            logger.error(f"[EMAIL ERROR] User approval email via Resend failed: {email_error}", exc_info=True)
+
+        # ---------------------------------------------------------
+        # 2️⃣ SEND EMAIL TO ADMIN (Resend API)
+        # ---------------------------------------------------------
+        try:
+            admin_subject = "Transaction Approved (Admin Notification)"
+
+            admin_html = f"""
+                <h3>Transaction Approved</h3>
+                <p>A transaction has been approved.</p>
+                <p><strong>User:</strong> {transaction.user.username}</p>
+                <p><strong>Amount:</strong> ${transaction.amount}</p>
+                <p><strong>Transaction ID:</strong> {transaction.id}</p>
+            """
+
+            send_resend_email(
+                to=settings.ADMIN_EMAIL,
+                subject=admin_subject,
+                html=admin_html
+            )
+
+        except Exception as admin_email_error:
+            logger.error(f"[ADMIN EMAIL ERROR] Admin approval email via Resend failed: {admin_email_error}", exc_info=True)
 
         # Redirect to success page
         success_url = reverse('investment:transaction_approved') + f'?transaction_id={transaction.id}'
