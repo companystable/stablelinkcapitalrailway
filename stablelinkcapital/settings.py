@@ -296,18 +296,33 @@ SECRET_KEY = os.getenv(
     "django-insecure-dev-key"  # fallback for local only
 )
 
-# DEBUG
+# # DEBUG
+# # DEBUG = os.getenv("DEBUG", "False") == "True"
 # DEBUG = os.getenv("DEBUG", "False") == "True"
-DEBUG = os.getenv("DEBUG", "False") == "True"
+
+# # Allowed hosts
+# ALLOWED_HOSTS = [
+#     "localhost",
+#     "127.0.0.1",
+#     "stablelinkcapitalrailway-production.up.railway.app",
+#     "stablelinkcapital.com",
+#     "www.stablelinkcapital.com",
+# ]
+
+
+import os
+
+# DEBUG
+# Always False on production
+DEBUG = False
 
 # Allowed hosts
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
     "stablelinkcapitalrailway-production.up.railway.app",
     "stablelinkcapital.com",
     "www.stablelinkcapital.com",
 ]
+
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
@@ -394,17 +409,30 @@ USE_TZ = True
 # STATIC FILES — FIXED FOR RAILWAY
 # ---------------------------------------
 
-STATIC_URL = "/static/"
+# STATIC_URL = "/static/"
 
-# Static root (ALWAYS needed on Railway)
+# # Static root (ALWAYS needed on Railway)
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# # WhiteNoise handles file compression/caching
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# # Local static folder
+# if DEBUG:
+#     STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# --------------------
+# STATIC FILES
+# --------------------
+# Directory where 'collectstatic' will gather all static files for production
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise handles file compression/caching
+# Use WhiteNoise for compression, caching, and serving static files in production
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Local static folder
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / "static"]
+# Do not include local static dirs in production
+# STATICFILES_DIRS is only needed for development, so we skip it here
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
