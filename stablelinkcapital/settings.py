@@ -314,7 +314,7 @@ import os
 
 # DEBUG
 # Always False on production
-DEBUG = False
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # Allowed hosts
 ALLOWED_HOSTS = [
