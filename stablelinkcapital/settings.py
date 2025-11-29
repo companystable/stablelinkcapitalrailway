@@ -409,30 +409,17 @@ USE_TZ = True
 # STATIC FILES — FIXED FOR RAILWAY
 # ---------------------------------------
 
-# STATIC_URL = "/static/"
+STATIC_URL = "/static/"
 
-# # Static root (ALWAYS needed on Railway)
-# STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# # WhiteNoise handles file compression/caching
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# # Local static folder
-# if DEBUG:
-#     STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# --------------------
-# STATIC FILES
-# --------------------
-# Directory where 'collectstatic' will gather all static files for production
+# Static root (ALWAYS needed on Railway)
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Use WhiteNoise for compression, caching, and serving static files in production
+# WhiteNoise handles file compression/caching
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Do not include local static dirs in production
-# STATICFILES_DIRS is only needed for development, so we skip it here
-
+# Local static folder
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
